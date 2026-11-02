@@ -33,6 +33,8 @@ Back up settings and keys before flashing. Switching between Meshtastic 2.7 and 
 
 Test reports are welcome in GitHub Issues. Please include the board and radio module, firmware version, and transmission results compared with the standard firmware.
 
+Related MeshCore firmware: [MeshCore-XD6500SHT](https://github.com/VoxMesh/MeshCore-XD6500SHT).
+
 ## License
 
 Based on [Meshtastic firmware](https://github.com/meshtastic/firmware), licensed under GPL-3.0. See [LICENSE](LICENSE). Third-party components retain their respective licenses.
