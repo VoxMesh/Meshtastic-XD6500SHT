@@ -31,7 +31,8 @@ Matching source archives accompany each binary release.
 
 Back up settings and keys before flashing. Switching between Meshtastic 2.7 and 2.8 may change the node number or discard stored data.
 
-Test reports are welcome in GitHub Issues. Please include the board and radio module, firmware version, and transmission results compared with the standard firmware.
+Test reports are welcome in [GitHub Issue #1](https://github.com/VoxMesh/Meshtastic-XD6500SHT/issues/1).
+Please include the board and radio module, firmware version, and transmission results compared with the standard firmware.
 
 Related MeshCore firmware: [MeshCore-XD6500SHT](https://github.com/VoxMesh/MeshCore-XD6500SHT).
 
