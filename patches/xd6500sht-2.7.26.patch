@@ -1,0 +1,69 @@
+diff --git a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
+index 82a4e1953..44de202bb 100644
+--- a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
++++ b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
+@@ -38,3 +38,19 @@ lib_deps =
+ extra_scripts =
+   ${nrf52840_base.extra_scripts}
+   variants/nrf52840/diy/nrf52_promicro_diy_tcxo/custom_build_tasks.py ; Add to PIO's Project Tasks pane: preset builds for common displays
++
++; Experimental DTQSYS ProMicro-SX1262 with XD6500SHT RF switch control
++[env:nrf52_promicro_xd6500sht]
++extends = env:nrf52_promicro_diy_tcxo
++board_level = extra
++custom_meshtastic_display_name = ProMicro XD6500SHT (experimental)
++custom_meshtastic_actively_supported = false
++build_flags =
++  ${env:nrf52_promicro_diy_tcxo.build_flags}
++  -D PROMICRO_XD6500SHT=1
++  "-ffile-prefix-map=$PROJECT_DIR=."
++  "-ffile-prefix-map=$PROJECT_CORE_DIR=platformio-core"
++lib_ignore =
++  ${nrf52_base.lib_ignore}
++  bsec2
++  BME68x Sensor library
+diff --git a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
+index 8e10141f5..3f722fede 100644
+--- a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
++++ b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
+@@ -9,6 +9,10 @@
+ 
+ #define PROMICRO_DIY_TCXO
+ 
++#ifndef PROMICRO_XD6500SHT
++#define PROMICRO_XD6500SHT 0
++#endif
++
+ /*----------------------------------------------------------------------------
+  *        Headers
+  *----------------------------------------------------------------------------*/
+@@ -116,11 +120,15 @@ NRF52 PRO MICRO PIN ASSIGNMENT
+ #define LORA_CS (32 + 13) // P1.13
+ 
+ // LORA MODULES
++#if PROMICRO_XD6500SHT
++#define USE_SX1262
++#else
+ #define USE_LLCC68
+ #define USE_SX1262
+ #define USE_RF95
+ #define USE_SX1268
+ #define USE_LR1121
++#endif
+ 
+ // RF95 CONFIG
+ 
+@@ -139,7 +147,12 @@ NRF52 PRO MICRO PIN ASSIGNMENT
+                                  // so it needs connecting externally if it is used in this way
+ #define SX126X_BUSY (0 + 29)     // P0.29
+ #define SX126X_RESET (0 + 9)     // P0.09
+-#define SX126X_RXEN (0 + 17)     // P0.17
++#if PROMICRO_XD6500SHT
++#define SX126X_RXEN RADIOLIB_NC
++#define SX126X_ANT_SW (0 + 17) // Keep the XD6500SHT switch enabled during both RX and TX.
++#else
++#define SX126X_RXEN (0 + 17) // P0.17
++#endif
+ #define SX126X_TXEN RADIOLIB_NC  // Assuming that DIO2 is connected to TXEN pin. If not, TXEN must be connected.
+ 
+ // LR1121

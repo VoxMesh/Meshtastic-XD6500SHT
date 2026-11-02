@@ -1,0 +1,73 @@
+diff --git a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
+index fd2f7a70f..b8e448327 100644
+--- a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
++++ b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/platformio.ini
+@@ -68,4 +68,16 @@ build_flags =
+   -D NRF52_PROMICRO_DIY
+   -D EASYPROMICRO ; For EasyProMicro pinout (instead of ProMicro pinout)
+ build_src_filter = ${nrf52_base.build_src_filter} +<../variants/nrf52840/diy/nrf52_promicro_diy_tcxo>
+-debug_tool = jlink
+\ No newline at end of file
++debug_tool = jlink
++
++; Experimental DTQSYS ProMicro-SX1262 with XD6500SHT RF switch control
++[env:nrf52_promicro_xd6500sht]
++extends = env:nrf52_promicro_diy_tcxo
++board_level = extra
++custom_meshtastic_display_name = ProMicro XD6500SHT (experimental)
++custom_meshtastic_actively_supported = false
++build_flags =
++  ${env:nrf52_promicro_diy_tcxo.build_flags}
++  -D PROMICRO_XD6500SHT=1
++  "-ffile-prefix-map=$PROJECT_DIR=."
++  "-ffile-prefix-map=$PROJECT_CORE_DIR=platformio-core"
+diff --git a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
+index 6ce8c0192..c6a49016b 100644
+--- a/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
++++ b/variants/nrf52840/diy/nrf52_promicro_diy_tcxo/variant.h
+@@ -9,6 +9,14 @@
+ 
+ #define PROMICRO_DIY_TCXO
+ 
++#ifndef PROMICRO_XD6500SHT
++#define PROMICRO_XD6500SHT 0
++#endif
++
++#if PROMICRO_XD6500SHT && (defined(EASYPROMICRO) || defined(PROMICRO_SX1280) || defined(PROMICRO_SX126X_TXEN))
++#error "XD6500SHT requires the standard ProMicro SX1262 pinout"
++#endif
++
+ /*----------------------------------------------------------------------------
+  *        Headers
+  *----------------------------------------------------------------------------*/
+@@ -165,12 +173,16 @@ https://github.com/brad112358/easy_E22
+ #define LORA_CS (32 + 13) // P1.13
+ 
+ // LORA MODULES
++#if PROMICRO_XD6500SHT
++#define USE_SX1262
++#else
+ #define USE_LLCC68
+ #define USE_SX1262
+ #define USE_RF95
+ #define USE_SX1268
+ #define USE_LR1121
+ #define USE_LR2021
++#endif
+ 
+ // RF95 CONFIG
+ #define LORA_DIO0 (0 + 29) // P0.29 BUSY
+@@ -200,7 +212,12 @@ https://github.com/brad112358/easy_E22
+                                  // so it needs connecting externally if it is used in this way
+ #define SX126X_BUSY (0 + 29)     // P0.29
+ #define SX126X_RESET (0 + 9)     // P0.09
+-#define SX126X_RXEN (0 + 17)     // P0.17
++#if PROMICRO_XD6500SHT
++#define SX126X_RXEN RADIOLIB_NC
++#define SX126X_ANT_SW (0 + 17) // Keep the XD6500SHT switch enabled during both RX and TX.
++#else
++#define SX126X_RXEN (0 + 17) // P0.17
++#endif
+ // Opt in with -D PROMICRO_SX126X_TXEN when P1.06 is wired to an external PA's TXEN.
+ #if defined(PROMICRO_SX126X_TXEN) && defined(PROMICRO_P106_FREE_FOR_TXEN)
+ #define SX126X_TXEN (32 + 6) // P1.06
